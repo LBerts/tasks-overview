@@ -19,8 +19,10 @@ const PRIORITY_META = {
 // ─── Parser ───────────────────────────────────────────────────────────────────
 
 function parseTask(line, filePath, lineNumber) {
-  // Strip blockquote markers (>, >>, > >, etc.) before parsing
-  const stripped = line.replace(/^(\s*>\s*)+/, "");
+  // Extract and preserve blockquote prefix (>, >>, "> >", etc.)
+  const prefixMatch = line.match(/^((?:\s*>\s*)+)/);
+  const blockquotePrefix = prefixMatch ? prefixMatch[1] : "";
+  const stripped = blockquotePrefix ? line.slice(blockquotePrefix.length) : line;
   const match = stripped.match(/^(\s*[-*]\s+\[([ xX])\]\s+)(.+)$/);
   if (!match) return null;
 
@@ -53,6 +55,7 @@ function parseTask(line, filePath, lineNumber) {
 
   return {
     rawLine: stripped.trim(),
+    blockquotePrefix,
     text, completed, priority,
     dueDate:    dueM   ? dueM[1]   : null,
     doneDate:   doneM  ? doneM[1]  : null,
@@ -637,7 +640,8 @@ class TasksBoardView extends obsidian.ItemView {
       if (!file) return;
       const content = await this.app.vault.read(file);
       const lines = content.split("\n");
-      lines[task.lineNumber] = newLine;
+      // Restore blockquote prefix ("> ") that was stripped before sending to Tasks modal
+      lines[task.lineNumber] = task.blockquotePrefix + newLine;
       await this.app.vault.modify(file, lines.join("\n"));
       await this.refresh();
       return;
