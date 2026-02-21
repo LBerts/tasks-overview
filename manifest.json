@@ -1,0 +1,11 @@
+{
+  "id": "tasks-overview",
+  "name": "Tasks Overview",
+  "version": "1.0.0",
+  "minAppVersion": "1.4.0",
+  "description": "A beautiful board view for the Obsidian Tasks plugin. Organize your tasks by due date, priority, or page \u2014 with filters, sorting, and inline editing.",
+  "author": "Lucas Berta",
+  "authorUrl": "https://github.com/lucasberta",
+  "fundingUrl": "",
+  "isDesktopOnly": false
+}
