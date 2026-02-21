@@ -293,6 +293,16 @@ const STYLES = `
   transition:color .12s, background .12s;
 }
 .tb-card-btn:hover { color:var(--interactive-accent); background:var(--background-modifier-hover); }
+.tb-page-chip {
+  font-size:11px; color:var(--text-faint);
+  background:var(--background-primary);
+  border:1px solid var(--background-modifier-border);
+  border-radius:4px; padding:0px 5px;
+  cursor:pointer; transition:color .12s, border-color .12s;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  max-width:120px; display:inline-block;
+}
+.tb-page-chip:hover { color:var(--interactive-accent); border-color:var(--interactive-accent); }
 
 /* ── Create Task Modal ── */
 .tb-modal-field { margin-bottom:12px; }
@@ -584,6 +594,13 @@ class TasksBoardView extends obsidian.ItemView {
     }
     if (task.recurrence) meta.createSpan({ cls: "tb-recur", text: `↻ ${task.recurrence}`, title: "Recurring" });
     for (const tag of task.tags) meta.createSpan({ cls: "tb-tag", text: tag });
+
+    // Show source page when not in Page view
+    if (this.mode !== "page") {
+      const pageChip = meta.createSpan({ cls: "tb-page-chip", text: task.fileName });
+      pageChip.title = task.filePath;
+      pageChip.onclick = e => { e.stopPropagation(); this.openFile(task.filePath, task.lineNumber); };
+    }
 
     // Action buttons
     const actions = card.createDiv("tb-card-actions");
