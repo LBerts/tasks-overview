@@ -4,7 +4,7 @@ A beautiful, minimal board view for [Obsidian Tasks](https://github.com/obsidian
 
 Instead of scattered task queries across your notes, Tasks Overview gives you a live sidebar panel that aggregates every task in your vault and lets you slice them however you need.
 
-![Tasks Overview Screenshot](screenshot.png)
+![Tasks Overview Screenshot](https://raw.githubusercontent.com/LBerts/tasks-overview/refs/heads/main/task%20overview%20screenshot.png)
 
 ---
 
@@ -36,7 +36,7 @@ Instead of scattered task queries across your notes, Tasks Overview gives you a 
 
 ### Manual installation
 
-1. Download `main.js` and `manifest.json` from the [latest release](https://github.com/lucasberta/tasks-overview/releases/latest)
+1. Download `main.js` and `manifest.json` from the [latest release](https://github.com/lberts/tasks-overview/releases/latest)
 2. Create the folder `<your-vault>/.obsidian/plugins/tasks-overview/`
 3. Copy both files into that folder
 4. Go to Settings → Community Plugins and enable **Tasks Overview**
