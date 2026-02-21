@@ -19,7 +19,9 @@ const PRIORITY_META = {
 // ─── Parser ───────────────────────────────────────────────────────────────────
 
 function parseTask(line, filePath, lineNumber) {
-  const match = line.match(/^(\s*[-*]\s+\[([ xX])\]\s+)(.+)$/);
+  // Strip blockquote markers (>, >>, > >, etc.) before parsing
+  const stripped = line.replace(/^(\s*>\s*)+/, "");
+  const match = stripped.match(/^(\s*[-*]\s+\[([ xX])\]\s+)(.+)$/);
   if (!match) return null;
 
   const completed = match[2].toLowerCase() === "x";
@@ -50,7 +52,7 @@ function parseTask(line, filePath, lineNumber) {
   const fileName = filePath.split("/").pop().replace(/\.md$/, "");
 
   return {
-    rawLine: line.trim(),
+    rawLine: stripped.trim(),
     text, completed, priority,
     dueDate:    dueM   ? dueM[1]   : null,
     doneDate:   doneM  ? doneM[1]  : null,
@@ -180,7 +182,7 @@ const STYLES = `
 .tb-row-label {
   font-size:11px; font-weight:600; color:var(--text-faint);
   text-transform:uppercase; letter-spacing:.04em;
-  white-space:nowrap; width:52px; flex-shrink:0;
+  white-space:nowrap; width:70px; flex-shrink:0;
 }
 /* First row (no-label) has a bit more top padding */
 .tb-row-first { padding-top:9px; padding-bottom:9px; }
@@ -337,11 +339,11 @@ class TasksBoardView extends obsidian.ItemView {
     this.plugin = plugin;
     this.tasks = [];
     // View mode
-    this.mode = "duedate";
+    this.mode = "priority";
     // Filters
-    this.filterThisMonth = false;
+    this.filterThisMonth = true;
     this.filterThisYear  = false;
-    this.filterNoDate    = false;
+    this.filterNoDate    = true;
     this.showDone        = false;
     // Sort
     this.sortBy  = "alpha";
@@ -360,7 +362,15 @@ class TasksBoardView extends obsidian.ItemView {
     const tasks = [];
     for (const file of this.app.vault.getMarkdownFiles()) {
       const content = await this.app.vault.cachedRead(file);
-      content.split("\n").forEach((line, i) => {
+      const lines = content.split("\n");
+      let inCodeBlock = false;
+      lines.forEach((line, i) => {
+        // Skip lines inside fenced code blocks (```tasks, ```js, etc.)
+        if (line.trimStart().startsWith("```")) {
+          inCodeBlock = !inCodeBlock;
+          return;
+        }
+        if (inCodeBlock) return;
         const t = parseTask(line, file.path, i);
         if (t) tasks.push(t);
       });
